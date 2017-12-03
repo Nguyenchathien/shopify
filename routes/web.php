@@ -11,6 +11,16 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Auth::routes();
+
+Route::resource('/', 'ProductController');
+
+Route::get('/', 'ProductController@index');
+
+Route::get('/product/edit/{id}', 'ProductController@edit')->name('product.edit');
+Route::put('/product/update/{id}', 'ProductController@update')->name('product.update');
+
+Route::get('/product/create', 'ProductController@create')->name('product.create');
+Route::post('/product/store', 'ProductController@store')->name('product.store');
+
+Route::delete('/product/destroy/{id}', 'ProductController@destroy')->name('product.destroy');
