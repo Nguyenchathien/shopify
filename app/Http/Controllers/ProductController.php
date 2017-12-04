@@ -76,7 +76,9 @@ class ProductController extends AppController
         }
 
 
-        $product = $this->setFormatDatas($request, $postFile);
+        $product = $this->setFormatDatas($request, $url_image);
+
+        // dd($product );
 
         $data_string = json_encode($product);
         $url = 'https://chathienstore.myshopify.com/admin/products.json';
