@@ -14,7 +14,7 @@
         <link rel="stylesheet" href="/css/select2.min.css"/>
 
         <!-- Google Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet">
 
         <!-- Compiled and minified JavaScript -->
         <script src="/js/jquery.min.js"></script>

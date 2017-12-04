@@ -9,7 +9,7 @@
                     <div class="col-md-12">
                         <div class="box box-info">
                             <div class="box-header with-border">
-                                <h3 class="box-title">Create product</h3>
+                                <h3 class="box-title">Add product</h3>
 
                                 <div class="box-tools">
                                     <div class="btn-group pull-right" style="margin-right: 10px">
@@ -41,8 +41,8 @@
                                                     <span class="panel-desc"> Title</span>
                                                 </h3>
                                             </div>
-                                            <div class="panel-body" style="padding-top: 0px;">
-                                                <input type="text" class="form-control" name="title" placeholder="Title" value="">
+                                            <div class="panel-body">
+                                                <input type="text" class="form-control" name="title" placeholder="Short Sleeve T-Shirt" value="">
                                             </div>
                                         </div>
 
@@ -54,6 +54,26 @@
                                             <textarea class="form-control" name="body_html" style="border:0px;"></textarea>
                                         </div><!-- .panel -->
 
+                                        <!-- ### SEO CONTENT ### -->
+                                        <div class="panel" style="padding: 0px 15px 15px 15px">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title"><i class="icon wb-search"></i> SEO Content</h3>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="col-content">
+                                                    <label class="small-title" for="name">Meta Description</label>
+                                                    <textarea class="form-control" name="meta_description"></textarea>
+                                                </div>
+                                                <div class="col-content">
+                                                    <label class="small-title" for="name">Meta Keywords</label>
+                                                    <textarea class="form-control" name="meta_keywords"></textarea>
+                                                </div>
+                                                <div class="col-content">
+                                                    <label class="small-title" for="name">Seo Title</label>
+                                                    <input type="text" class="form-control" name="seo_title" placeholder="SEO Title" value="">
+                                                </div>
+                                            </div>
+                                        </div>
 
                                     </div>
                                     <div class="col-md-4">
@@ -63,22 +83,54 @@
                                                 <h3 class="panel-title">Organization</h3>
                                             </div>
                                             <div class="panel-body" id="organization">
-                                                <div class="">
-                                                    <label for="name">Product type</label>
-                                                    <select class="form-control" name="product_type">
-                                                        
-                                                    </select>
+                                                <div class="col-content">
+                                                    <label class="small-title" for="name">Product type</label>
+                                                    <select id="product_type" name="product_type[]" class="form-control" multiple></select>
                                                 </div>
-                                                <div class="">
-                                                    <label for="name">Vendor</label>
+                                                <div class="col-content">
+                                                    <label class="small-title" for="name">Vendor</label>
                                                     <input type="input" name="vendor" class="form-control">
                                                 </div>
-                                                <div class="">
-                                                    <label for="name">Tags</label>
+                                                <div class="col-content">
+                                                    <label class="small-title" for="name">Tags</label>
                                                     <input type="input" name="tag[]" class="form-control">
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <!-- ### PRICE ### -->
+                                        <div class="panel panel panel-bordered panel-warning">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Pricing</h3>
+                                            </div>
+                                            <div class="panel-body" id="price">
+												<div class="col-content">
+	                                            	<label class="small-title">Price</label>
+	                                                <input type="text" class="form-control" name="price" placeholder="Price" value="">
+	                                            </div>
+	                                            <div class="col-content">
+	                                            	<label class="small-title">Compare at price</label>
+	                                                <input type="text" class="form-control" name="compare_price" placeholder="Compare at price" value="">
+	                                            </div>
+                                            </div>
+                                        </div><!-- .panel -->
+
+                                        <!-- ### PRICE ### -->
+                                        <div class="panel panel panel-bordered panel-warning">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Inventory</h3>
+                                            </div>
+                                            <div class="panel-body" id="inventory">
+												<div class="col-content">
+	                                            	<label class="small-title">SKU (Stock Keeping Unit)</label>
+	                                                <input type="text" class="form-control" name="sku" placeholder="Sku" value="">
+	                                            </div>
+	                                            <div class="col-content">
+	                                            	<label class="small-title">Barcode (ISBN, UPC, GTIN, etc.)</label>
+	                                                <input type="text" class="form-control" name="barcode" placeholder="Barcode" value="">
+	                                            </div>
+                                            </div>
+                                        </div><!-- .panel -->
 
                                         <!-- ### IMAGE ### -->
                                         <div class="panel panel-bordered panel-primary">
@@ -90,26 +142,7 @@
                                             </div>
                                         </div>
 
-                                        <!-- ### SEO CONTENT ### -->
-                                        <div class="panel panel-bordered panel-info">
-                                            <div class="panel-heading">
-                                                <h3 class="panel-title"><i class="icon wb-search"></i> SEO Content</h3>
-                                            </div>
-                                            <div class="panel-body">
-                                                <div class="">
-                                                    <label for="name">Meta Description</label>
-                                                    <textarea class="form-control" name="meta_description"></textarea>
-                                                </div>
-                                                <div class="">
-                                                    <label for="name">Meta Keywords</label>
-                                                    <textarea class="form-control" name="meta_keywords"></textarea>
-                                                </div>
-                                                <div class="">
-                                                    <label for="name">Seo Title</label>
-                                                    <input type="text" class="form-control" name="seo_title" placeholder="SEO Title" value="">
-                                                </div>
-                                            </div>
-                                        </div>
+                                        
                                     </div>
                                     <div class="clearfix"></div>
                                 </div>
@@ -128,6 +161,27 @@
     </div>
 </div>
 <script>
-    CKEDITOR.replace( 'body_html' );
+    
+        CKEDITOR.replace( 'body_html' );
+
+        $('#product_type').select2({
+            placeholder: "Choose tags...",
+            minimumInputLength: 2,
+            ajax: {
+                url: '/tags/find',
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        q: $.trim(params.term)
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+            }
+        });
 </script>
 @stop
