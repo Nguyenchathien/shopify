@@ -37,7 +37,7 @@ class ProductController extends AppController
         // dd(Shopify::api('types')->all());
         //get list products on Shopify store
         $products = Shopify::api('products')->all();
-        dd($products["products"]);
+        // dd($products["products"]);
 
         return view('products.index',[
                 'products'    => $products["products"]
