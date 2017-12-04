@@ -34,9 +34,10 @@ class ProductController extends AppController
      */
     public function index(Request $request)
     {
+        // dd(Shopify::api('types')->all());
         //get list products on Shopify store
         $products = Shopify::api('products')->all();
-        // dd($products["products"]);
+        dd($products["products"]);
 
         return view('products.index',[
                 'products'    => $products["products"]
@@ -65,8 +66,8 @@ class ProductController extends AppController
             $dir=$path.'/'.$filename;
             $url_image = env('APP_URL').'/upload/img/'.$filename;
             //get the extension of the image file
-            $tumbnailExtention = preg_replace('/^.*\.([^.]+)$/D', '$1', $url_image);
-            $postFile = "@$url_image;type=image/$tumbnailExtention";
+            $tumbnailExtention = preg_replace('/^.*\.([^.]+)$/D', '$1', $dir);
+            $postFile = "@$dir;type=image/$tumbnailExtention";
              
             if(file_exists($dir)) {
                 // exec(" magick convert $dir -fuzz 0% -transparent none -quality 20 -depth 8 ");
@@ -144,7 +145,7 @@ class ProductController extends AppController
                                 )
         );
 
-        // dd($res);
+        dd($res);
 
         return $res;
 
@@ -320,21 +321,27 @@ class ProductController extends AppController
         return redirect('/');
     }
 
-    function transparentPaintImage($color, $alpha, $fuzz) {
-        $imagick = new \Imagick(realpath("images/BlueScreen.jpg"));
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getProductTypes(Request $request)
+    {
+        $term = trim($request->q);
 
-        //Need to be in a format that supports transparency
-        $imagick->setimageformat('png');
+        if (empty($term)) {
+            return \Response::json([]);
+        }
 
-        $imagick->transparentPaintImage(
-            $color, $alpha, $fuzz * \Imagick::getQuantum(), false
-        );
+        $categories = Tag::search($term)->limit(5)->get();
 
-        //Not required, but helps tidy up left over pixels
-        $imagick->despeckleimage();
+        $formatted_tags = [];
 
-        header("Content-Type: image/png");
-        echo $imagick->getImageBlob();
+        foreach ($tags as $tag) {
+            $formatted_tags[] = ['id' => $tag->id, 'text' => $tag->name];
+        }
+
+        return \Response::json($formatted_tags);
     }
 
     public function destroy($id)
