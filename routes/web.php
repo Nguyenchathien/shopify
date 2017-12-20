@@ -23,4 +23,6 @@ Route::put('/product/update/{id}', 'ProductController@update')->name('product.up
 Route::get('/product/create', 'ProductController@create')->name('product.create');
 Route::post('/product/store', 'ProductController@store')->name('product.store');
 
-Route::delete('/product/destroy/{id}', 'ProductController@destroy')->name('product.destroy');
+Route::get('/tags/find', 'ProductController@findTag');
+
+Route::post('/product/destroy', 'ProductController@destroy')->name('product.destroy');

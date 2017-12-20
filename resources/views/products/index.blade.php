@@ -14,69 +14,42 @@
                 </header>
                 <div class="product-content">
                     <div class="filter">
-                        <div class="filter-title"><h3>All</h3></div>
-                        <div class="filter-search">
-                            <div class="col-md-12">
-                                <div class="input-group" id="adv-search">
-                                    <input type="text" class="form-control" placeholder="Search for products" />
-                                    <div class="input-group-btn">
-                                        <div class="btn-group" role="group">
-                                            <div class="dropdown dropdown-lg">
-                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></button>
-                                                <div class="dropdown-menu dropdown-menu-right" role="menu">
-                                                    <form class="form-horizontal" role="form">
-                                                        <div class="form-group">
-                                                            <label for="filter">Filter by</label>
-                                                            <select class="form-control">
-                                                                <option value="0" selected>All Snippets</option>
-                                                                <option value="1">Featured</option>
-                                                                <option value="2">Most popular</option>
-                                                                <option value="3">Top rated</option>
-                                                                <option value="4">Most commented</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="contain">Author</label>
-                                                            <input class="form-control" type="text" />
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="contain">Contains the words</label>
-                                                            <input class="form-control" type="text" />
-                                                        </div>
-                                                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-                                                    </form>
-                                                </div>
-                                            <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-                                        </div>
-                                    </div>
-                                </div>
-                              </div>
-                        </div>
+                        <div class="filter-title"><h3>All products</h3></div>
                     </div>
                     <div class="table-responsive products-results col-md-12">
-                        <table id="all-products" class="table table-bordred table-striped">
+                        {{ csrf_field() }}
+                        <table id="all-products" class="table table-bordred table-striped display" cellspacing="0" width="100%">
                             <thead>
                                 <th><input type="checkbox" id="checkall" /></th>
+                                <th></th>
                                 <th>Product</th>
                                 <th>Inventory</th>
                                 <th>Type</th>
                                 <th>Vendor</th>
-                                <th>Edit</th>
-                                <th>Delete</th>
+                                <th></th>
+                                <th></th>
                            </thead>
                            <tbody>
                             @foreach($products as $product)
                                 <tr>
-                                    <td><input type="checkbox" class="checkthis" /></td>
-                                    <td>
-                                        <a href=""><img class="product-img" src="{{ $product["image"]["src"] }}" alt="{{ $product["title"] }}" />
-                                        <span class="product-name">{{ $product["title"] }}</span></a>
+                                    <td style="width: 25px; text-align: center;"><input type="checkbox" class="checkthis" /></td>
+                                    <td style="width: 90px;">
+                                        <a href="/product/edit/{{ $product["id"] }}"><img class="product-img" @if($product["image"]["src"]) src="{{ $product["image"]["src"] }} " @else src="/images/noimage.png" height="50px" @endif alt="{{ $product["title"] }}" style="max-width: 70px;"/></a>
+                                        <!-- <span class="product-name">{{ $product["title"] }}</span></a> -->
                                     </td>
-                                    <td>Irshad</td>
-                                    <td>Pakistan</td>
+                                    <td><a href="/product/edit/{{ $product["id"] }}">{{ $product["title"] }}</a></td>
+                                    <td>
+										@if($product["variants"][0]["old_inventory_quantity"] > 1 )
+											{{ $product["variants"][0]["old_inventory_quantity"] }} in stock for {{ count($product["variants"]) }} variants
+										@else
+											N/A
+										@endif
+									
+									</td>
+                                    <td>{{ $product["product_type"] }}</td>
                                     <td>{{ $product["vendor"] }}</td>
-                                    <td><a href="/product/edit/{{ $product["id"] }}"><button class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-pencil"></span></button></td>
-                                    <td><p data-placement="top" data-toggle="tooltip" title="Delete"><button class="btn btn-danger btn-xs" data-title="Delete" data-toggle="modal" data-target="#delete" ><span class="glyphicon glyphicon-trash"></span></button></p></td>
+                                    <td style="text-align: right;"><a href="/product/edit/{{ $product["id"] }}"><button class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-pencil"></span></button></td>
+                                    <td><p data-placement="top" data-toggle="tooltip" title="Delete" style="margin: 0px;"><button class="btn btn-danger btn-xs btn-remove-product" data-title="Delete" data-toggle="modal" data-target="#delete" data-product-id="{{ $product["id"] }}"><span class="glyphicon glyphicon-trash"></span></button></p></td>
                                 </tr>
                             @endforeach
                            </tbody>
@@ -87,25 +60,78 @@
         </div>
     </div>
 </div>
-            
-    
-    <script type="text/javascript">
-    $(document).ready(function(){
-        $("#mytable #checkall").click(function () {
-                if ($("#mytable #checkall").is(':checked')) {
-                    $("#mytable input[type=checkbox]").each(function () {
-                        $(this).prop("checked", true);
-                    });
 
-                } else {
-                    $("#mytable input[type=checkbox]").each(function () {
-                        $(this).prop("checked", false);
-                    });
+<div class="modal modal-danger fade" tabindex="-1" id="delete" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title"><i class="voyager-trash"></i> Deleted products cannot be recovered. Do you still want to continue?</h4>
+            </div>
+            <div class="modal-footer">
+                <form id="delete_form">
+                    <input type="button" class="btn btn-danger pull-right delete-confirm" value="Yes, Delete it!">
+                </form>
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal" style="margin-right: 10px;">Cancel</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<script type="text/javascript">
+    $(function() {
+
+        $('#all-products').DataTable({
+            "columnDefs": [
+               { 
+                    "orderable": false, 
+                    "targets": [0, 1, 6, 7], 
                 }
-            });
-            
-            // $("[data-toggle=tooltip]").tooltip();
+            ]
         });
 
-    </script>
+        $("#all-products #checkall").click(function () {
+            if ($("#all-products #checkall").is(':checked')) {
+                $("#all-products input[type=checkbox]").each(function () {
+                    $(this).prop("checked", true);
+                });
+
+            } else {
+                $("#all-products input[type=checkbox]").each(function () {
+                    $(this).prop("checked", false);
+                });
+            }
+        });
+
+        //remove
+        $(".btn-remove-product").click(function(e) {
+            var product_id=$(this).attr("data-product-id");
+            console.log(product_id);
+            $(document).on("click", ".delete-confirm", function(e) {
+                $.ajax({
+                    url: "{{ route('product.destroy') }}",
+                    type:"POST",
+                    beforeSend: function (xhr) {
+                        var token = $('input[name="_token"]').val();
+
+                        if (token) {
+                          return xhr.setRequestHeader('X-CSRF-TOKEN', token);
+                        }
+                    },
+                    data: { id : product_id },
+                    dataType: 'json',
+                    success: function(data) {
+                        console.log(data);
+                        // $('#remove').modal('hide');
+                        // elm.parents(".comment").first().remove();
+                    }
+                });
+            });
+        });
+            
+            // $("[data-toggle=tooltip]").tooltip();
+	});
+
+</script>
+
 @endsection
