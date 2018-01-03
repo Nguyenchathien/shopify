@@ -9,7 +9,7 @@
                 <header class="title">
                     <div class="ui-title-bar">
                         <h1>Products</h1>
-                        <a href="/product/create" class="btn btn-primary btn-add">Add product</a>
+                        <a href="/product/create" class="btn btn-primary btn-add"><i class="fa fa-plus" aria-hidden="true"></i> Add product</a>
                     </div>
                 </header>
                 <div class="product-content">
@@ -31,10 +31,10 @@
                            </thead>
                            <tbody>
                             @foreach($products as $product)
-                                <tr>
+                                <tr data-id="{{$product["id"]}}">
                                     <td style="width: 25px; text-align: center;"><input type="checkbox" class="checkthis" /></td>
                                     <td style="width: 90px;">
-                                        <a href="/product/edit/{{ $product["id"] }}"><img class="product-img" @if($product["image"]["src"]) src="{{ $product["image"]["src"] }} " @else src="/images/noimage.png" height="50px" @endif alt="{{ $product["title"] }}" style="max-width: 70px;"/></a>
+                                        <a href="/product/edit/{{ $product["id"] }}"><img class="product-img" @if($product["image"]["src"]) src="{{ $product["image"]["src"] }} " @else src="/images/no_image.png" height="50px" @endif alt="{{ $product["title"] }}" style="max-width: 70px;"/></a>
                                         <!-- <span class="product-name">{{ $product["title"] }}</span></a> -->
                                     </td>
                                     <td><a href="/product/edit/{{ $product["id"] }}">{{ $product["title"] }}</a></td>
@@ -44,12 +44,11 @@
 										@else
 											N/A
 										@endif
-									
 									</td>
                                     <td>{{ $product["product_type"] }}</td>
                                     <td>{{ $product["vendor"] }}</td>
                                     <td style="text-align: right;"><a href="/product/edit/{{ $product["id"] }}"><button class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-pencil"></span></button></td>
-                                    <td><p data-placement="top" data-toggle="tooltip" title="Delete" style="margin: 0px;"><button class="btn btn-danger btn-xs btn-remove-product" data-title="Delete" data-toggle="modal" data-target="#delete" data-product-id="{{ $product["id"] }}"><span class="glyphicon glyphicon-trash"></span></button></p></td>
+                                    <td><p data-placement="top" data-toggle="tooltip" title="Delete" style="margin: 0px;"><button class="btn btn-danger btn-xs btn-remove-product" data-title="Delete" data-toggle="modal" data-target="#deleteModal" data-product-id="{{ $product["id"] }}"><span class="glyphicon glyphicon-trash"></span></button></p></td>
                                 </tr>
                             @endforeach
                            </tbody>
@@ -61,12 +60,15 @@
     </div>
 </div>
 
-<div class="modal modal-danger fade" tabindex="-1" id="delete" role="dialog" style="display: none;">
+<div class="modal modal-danger fade" tabindex="-1" id="deleteModal" role="dialog" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                <h4 class="modal-title"><i class="voyager-trash"></i> Deleted products cannot be recovered. Do you still want to continue?</h4>
+                <h2 class="modal-title">Delete product?</h2>
+            </div>
+            <div class="modal-body">
+                <p><i class="voyager-trash"></i> Deleted products cannot be recovered. Do you still want to continue?</p>  
             </div>
             <div class="modal-footer">
                 <form id="delete_form">
@@ -106,30 +108,36 @@
         //remove
         $(".btn-remove-product").click(function(e) {
             var product_id=$(this).attr("data-product-id");
-            console.log(product_id);
-            $(document).on("click", ".delete-confirm", function(e) {
+            $(".delete-confirm").click(function(e) {
                 $.ajax({
-                    url: "{{ route('product.destroy') }}",
-                    type:"POST",
+                    url: "/product/destroy/" + product_id,
+                    type:"GET",
+                    dataType: 'json',
+                    data: { id : product_id },
                     beforeSend: function (xhr) {
                         var token = $('input[name="_token"]').val();
-
                         if (token) {
-                          return xhr.setRequestHeader('X-CSRF-TOKEN', token);
+                            return xhr.setRequestHeader('X-CSRF-TOKEN', token);
                         }
                     },
-                    data: { id : product_id },
-                    dataType: 'json',
-                    success: function(data) {
-                        console.log(data);
-                        // $('#remove').modal('hide');
-                        // elm.parents(".comment").first().remove();
+                    success: function(res) {
+                        if(res["status"] === "YES" ) {
+
+                            var tr = $("#all-products").find("tr[data-id=" + product_id + "]");
+                            tr.remove();
+                            $('#deleteModal').modal('hide');
+                            toastr.success('Product was successfully deleted');
+                        }
+                    },
+                    error: function( data ) {
+                        if ( data["status"] === "NO" ) {
+                            toastr.error('Cannot delete the category');
+                            $('#deleteModal').modal('hide');
+                        }
                     }
                 });
             });
         });
-            
-            // $("[data-toggle=tooltip]").tooltip();
 	});
 
 </script>

@@ -6,7 +6,6 @@ use App\Http\Controllers\AppController;
 use Illuminate\Support\Facades\Validator;
 use Shopify;
 use App\Image;
-use \stdClass;
 use Imagick;
 use ImagickPixel;
 use Illuminate\Http\Request;
@@ -24,9 +23,11 @@ class ProductController extends AppController
     }
 
     /**
-     * Get list product
+     * Show product list.
+     *
+     * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
         //get list products on Shopify store
         $products = Shopify::api('products')->all();
@@ -37,24 +38,25 @@ class ProductController extends AppController
 
     }
 
+	/**
+     * Display create page
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function create()
     {
-
         return view('products.create');
     }
 
+	/**
+     * Create the specified resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
     {
-        // dd($request->all());
-        // $this->validate($request, [
-        //     'product[title]' => 'required',
-        // ]);
-
-		$notification = array(
-			'message' => 'Product was successfully created', 
-			'alert-type' => 'success'
-		);
-
 		$product = array();
         $product["product"] = array();
         $product["product"] = $request->product;
@@ -66,7 +68,7 @@ class ProductController extends AppController
 
         if(!empty($sizes)) $product["product"]["options"][]     = array("name" => $request->size);
         if(!empty($colors)) $product["product"]["options"][]    = array("name" => $request->color);
-        if(!empty($materials)) $product["product"]["options"][] = array("name" => $request->material);
+        if(!empty($materials)) $product["product"]["options"][] = array("name" => $request->marterial);
 
         if ($request->hasFile('image')) {
             $photo = $request->file('image');
@@ -80,7 +82,6 @@ class ProductController extends AppController
 
             if(file_exists($dir)) {
                 $imagick = new Imagick($dir);
-				// $imagick->borderImage(new ImagickPixel("red"), 50, 50);
 				$imagick->setCompressionQuality(20);
 				$imagick->setImageDepth(8);
 				$imagick->despeckleimage();
@@ -92,14 +93,12 @@ class ProductController extends AppController
             );
 
             $product["product"]["image"] = array("src" => $url_image);
-
         }
-		dd($product); 
+
         if($product) {
 
 			$product_url = "/admin/products.json";
             $res = $this->sendRequest($product, $product_url, "POST");
-            // dd($res);
             if($res) {
 
                 //remove image after upload successful
@@ -107,6 +106,11 @@ class ProductController extends AppController
                 // unlink($dir);
             }
         }
+		
+		$notification = array(
+			'message' => 'Product was successfully created', 
+			'alert-type' => 'success'
+		);
 
         return redirect('/')->with($notification);
 
@@ -124,8 +128,6 @@ class ProductController extends AppController
         //get product information
         $product = Shopify::api('products')->show($id);
         $images = $this->getImageVariant($product["product"]["images"]);
-        // dd($images[1416133738537]);
-        dd(gettype($product["product"]["tags"]));
         if(!$product) {
             $notification = array(
                 'message' => 'Product Not Found', 
@@ -151,25 +153,13 @@ class ProductController extends AppController
      */
     public function update(Request $request, $id) 
     {
-    	// dd($request->all());
-        // $this->validate($request, [
-        //     'title' => 'required',
-        // ]);
-    	// $variants = $request->product["variants"]?$request->product["variants"]:'';
     	$product = array();
         $product["product"] = array();
         $product["product"] = $request->product;
-        // $product["product"]["variants"] = $variants;
 
         $sizes      = $request->sizes?$request->sizes:'';
         $colors     = $request->colors?$request->colors:'';
         $materials  = $request->materials?$request->materials:'';
-
-        //$product_type 		= $request->product["product_type"]?$request->product["product_type"]:'';
-        // $product_vendor  	= $request->product["vendor"]?$request->product["vendor"]:'';
-        // $product_tags  		= $request->product["tags"][]?$request->product["tags"][]:'';
-
-        // dd($product_type);
 
         if(!empty($sizes)) $product["product"]["options"][]     = array("name" => $request->size);
         if(!empty($colors)) $product["product"]["options"][]    = array("name" => $request->color);
@@ -187,29 +177,30 @@ class ProductController extends AppController
 
             if(file_exists($dir)) {
                 $imagick = new Imagick($dir);
-				// $imagick->borderImage(new ImagickPixel("red"), 50, 50);
 				$imagick->setCompressionQuality(20);
 				$imagick->setImageDepth(8);
 				$imagick->despeckleimage();
 		        $imagick->writeImage($dir);
             }
 
-            $product["product"]["images"] = array(
-                array("src" => $url_image)
-            );
-
-            $product["product"]["image"] = array("src" => $url_image);
+			$img_src = array("src" => $url_image);
+            $product["product"]["image"] = $img_src;
+            if(!empty($product["product"]["images"])) {
+		        array_unshift($product["product"]["images"], $img_src);
+            }else{
+                $product["product"]["images"] = array($img_src);
+            }
 
         } else {
-
-        	$product["product"]["images"] = array(
-                array("src" => $request->url_image)
-            );
-
-            $product["product"]["image"] = array("src" => $request->url_image);
+			
+			$img_id = array("id" => $request->image_id);
+            $product["product"]["image"] = $img_id;
+            if(!empty($product["product"]["images"])) {
+                array_unshift($product["product"]["images"], $img_id);
+            }else{
+                $product["product"]["images"] = $img_id;
+            }
         }
-
-        // dd($product);
 
         if($product) {
 
@@ -235,15 +226,153 @@ class ProductController extends AppController
         return redirect('/')->with($notification);
     }
 
-    public function destroy(Request $request)
+	/**
+     * Display create page
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function editVariant($product_id, $variant_id)
     {
-        $product_id = $request->input('id');
-        dd($product_id);
+		//get product and variant information
+        $product 	= Shopify::api('products')->show($product_id);
+		$variant 	= Shopify::api('variants')->show($variant_id);
+		$variants 	= Shopify::api('variants')->product($product_id)->all();
+		$images 	= $this->getImageVariant($product["product"]["images"]);
+		
+		return view('products.variants.update',[
+                'variant'	=> $variant["variant"],
+                'variants'	=> $variants["variants"],
+                'product'	=> $product["product"],
+                'images'	=> $images
+            ]);
+    }
 
-        $res = Shopify::remove();
+    /**
+     * Update variant information
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function updateVariant(Request $request, $variant_id)
+    {
+    	$variant = array();
+        $variant["variant"] = array();
+        $variant["variant"] = $request->variant;
+        $variant["variant"]["inventory_management"]=($request->variant["inventory_management"]=="shopify")?"shopify":'';
+
+        if ($request->hasFile('image')) {
+            $photo 		= $request->file('image');
+            // $filename 	= $request->variant["title"].'.'.$photo->getClientOriginalExtension();
+            $filename 	= str_random(6).'.'.$photo->getClientOriginalExtension();
+            $path 		= public_path().'/upload/img';
+            $photo->move($path, $filename);
+            $dir		=$path.'/'.$filename;
+        	$url_image 	= env('APP_URL').'/upload/img/'.$filename;
+
+            if(file_exists($dir)) {
+                $imagick = new Imagick($dir);
+				$imagick->setCompressionQuality(20);
+				$imagick->setImageDepth(8);
+				$imagick->despeckleimage();
+		        $imagick->writeImage($dir);
+            }
+
+            // Update a product variant with an image
+            $images = array();
+            $images["image"] = array();
+            $images["image"]["variant_ids"] = array($variant_id);
+            $images["image"]["src"] = $url_image;
+            $product_id = $request->product_id;
+            $img_url = "/admin/products/$product_id/images.json";
+            $result = $this->sendRequest($images, $img_url, "POST");
+
+            if(!$result) {
+                $notification = array(
+                    'message' => 'Update fail!', 
+                    'alert-type' => 'error'
+                );
+
+                return redirect('/')->with($notification);
+            }
+
+        } else {
+        	$variant["variant"]["image_id"]=$request->image_id;
+        }
+
+        if($variant) {
+
+            $notification = array(
+                'message' => 'Variant was successfully updated', 
+                'alert-type' => 'success'
+            );
+
+        	$variant_id = $request->variant["id"];
+            $variant_url = "/admin/variants/$variant_id.json";
+            $res = $this->sendRequest($variant, $variant_url, "PUT");
+            if(!$res) {
+                $notification = array(
+                    'message' => 'Update fail!', 
+                    'alert-type' => 'error'
+                );
+
+                return redirect('/')->with($notification);
+            }
+
+        }
+
+        return redirect('/')->with($notification);
+    }
+	
+	/**
+     * delete product
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $product_url = "/admin/products/$id.json";
+        $res = $this->sendRequest("", $product_url, "DELETE");
+        if(!$res) {
+            return response()->json([
+                'status' => 'NO'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'YES'
+        ]);
 
     }
 
+    /**
+     * delete product variant
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function variantDestroy(Request $request)
+    {
+		$product_id = $request->product_id;
+		$variant_id = $request->variant_id;
+		
+        $product_url = "admin/products/$product_id/variants/$variant_id.json";
+        $res = $this->sendRequest("", $product_url, "DELETE");
+		
+        if(!$res) {
+            return response()->json([
+                'status' => 'NO'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'YES'
+        ]);
+
+    }
+
+    /**
+     * get list variant images
+     *
+     * @return array()
+     */
     public function getImageVariant($images)
     {
         $res = array();
@@ -254,6 +383,13 @@ class ProductController extends AppController
         return $res;
     }
 
+	/**
+     * Create product variant list
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return array()
+     */
     public function createVariants($request)
     {
         $sizes      = $request->sizes?$request->sizes:'';

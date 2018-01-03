@@ -20,10 +20,9 @@ class AppController extends Controller
         curl_setopt($curl, CURLOPT_HTTPHEADER, array(                                                                          
             'Content-Type: application/json',                                                                                
             'Content-Length: ' . strlen($data_string))                                                                       
-        );                                                                                                                   
-                                                                                                                             
+        );                                                                                                  
         $result = curl_exec($curl);
-
+		
         return $result;
     }
     

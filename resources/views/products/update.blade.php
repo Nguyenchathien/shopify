@@ -22,7 +22,7 @@
                             </div>
                             {!! Form::model($product, array('url'=>'product/update/' . $product["id"], 'class'=>'form-horizontal', 'files' => true, 'method'=>'PUT')) !!}
                                 {{ csrf_field() }}
-                                <input type="hidden" name="url_image" @if(isset($product["image"])) value="{{ $product["image"]["src"]}}" @else value=" " @endif>
+                                <input type="hidden" name="image_id" @if(isset($product["image"]["id"])) value="{{ $product["image"]["id"] }}" @endif>
                                 <input type="hidden" name="product[id]" value="{{ $product["id"]}}">
                                 <div class="box-body">
                                     <div class="col-md-8">
@@ -60,56 +60,59 @@
                                         <div class="panel" style="padding: 0px 15px 15px 15px">
                                             <div class="panel-heading">
                                                 <h3 class="panel-title"> Variants</h3>
-                                                <small style="float: left;margin: 2rem 0;">Select:</small>
+                                                <!--<small style="float: left;margin: 2rem 0;">Select:</small>-->
                                             </div>
                                             <div class="panel-body">
-                                                <div class="table-wrapper">
-								                        <table id="all-products" class="table table-responsive" cellspacing="0" width="100%">
-								                            <thead>
-								                                <!-- <th><input type="checkbox" id="checkall" /></th> -->
-                                                                <td>No.</td>
-								                                <th></th>
-                                                                @if(!empty($product["options"]))
-                                                                    @foreach($product["options"] as $op => $option)
-    								                                <th>{{$option["name"]}}</th>
-                                                                    @endforeach
-                                                                @endif
-								                                <th>Inventory</th>
-								                                <th>Price</th>
-								                                <th>Sku</th>
-								                                <th></th>
-								                                <th></th>
-								                           </thead>
-								                           <tbody>
-								                            @foreach($product["variants"] as $var => $variant)
-								                                <tr>
-                                                                    <input type="hidden" name="product[variants][{{$var}}][id]" value="{{$variant["id"]}}">
-                                                                    <input type="hidden" name="product[variants][{{$var}}][src]" @if(array_key_exists($variant["image_id"],$images)) value="{{$images[$variant["image_id"]]}} " @else value=""@endif>
-                                                                    <td>{{$var+1}}</td>
-								                                    <!-- <td style="width: 25px; text-align: center;"><input type="checkbox" class="checkthis" /></td> -->
-								                                    <td style="width: 90px;">
-								                                        <a href="/product/edit/{{ $variant["id"] }}"><img class="product-img" @if(array_key_exists($variant["image_id"],$images)) src="{{$images[$variant["image_id"]]}} " @else src="/images/noimage.png" height="60px" @endif alt="{{ $variant["title"] }}" style="max-width: 70px;" /></a>
-								                                    </td>
-                                                                    @if(!empty($variant["option1"]))
-								                                    <td><input type="text" class="form-control" name="product[variants][{{$var}}][option1]" value="{{ $variant["option1"] }}"></td>
-                                                                    @endif
-                                                                    @if(!empty($variant["option2"]))
-								                                    <td><input type="text" class="form-control" name="product[variants][{{$var}}][option2]" value="{{ $variant["option2"] }}"></td>
-                                                                    @endif
-                                                                    @if(!empty($variant["option3"]))
-                                                                    <td><input type="text" class="form-control" name="product[variants][{{$var}}][option3]" value="{{ $variant["option3"] }}"></td>
-                                                                    @endif
-                                                                    <td><input type="text" class="form-control" name="product[variants][{{$var}}][inventory_quantity]" value="{{ $variant["inventory_quantity"] }}"></td>
-								                                    <td>
-                                                                        <input type="text" name="product[variants][{{$var}}][price]" class="form-control" value="{{ $variant["price"] }}">
-                                                                    </td>
-								                                    <td><input type="text" class="form-control" name="product[variants][{{$var}}][sku]" value="{{ $variant["sku"] }}"></td>
-								                                    <td style="text-align: right;"><a href="/product/edit/{{ $product["id"] }}"><button class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-pencil"></span></button></td>
-								                                    <td><p data-placement="top" data-toggle="tooltip" title="Delete" style="margin:0;"><button class="btn btn-danger btn-xs" data-title="Delete" data-toggle="modal" data-target="#delete"><span class="glyphicon glyphicon-trash"></span></button></p></td>
-								                                </tr>
-								                            @endforeach
-								                           </tbody>
-								                        </table>
+                                                <div class="table-wrapper table-responsive dataTables_wrapper">
+													<table id="all-products" class="table dataTable table-striped" cellspacing="0" width="100%">
+														<thead>
+															<!-- <th><input type="checkbox" id="checkall" /></th> -->
+															<td style="padding: 10px 2px;">No.</td>
+															<th></th>
+															@if(!empty($product["options"]))
+																@foreach($product["options"] as $opt => $option)
+																<th>{{$option["name"]}}</th>
+																@endforeach
+															@endif
+															<th>Inventory</th>
+															<th>Price</th>
+															<th>Sku</th>
+															<th>Edit</th>
+															<!--<th></th>-->
+													   </thead>
+													   <tbody>
+														@foreach($product["variants"] as $var => $variant)
+															<tr data-id="{{$variant["id"]}}">
+																<input type="hidden" name="product[variants][{{$var}}][id]" value="{{$variant["id"]}}">
+																@if(!empty($variant["image_id"]))
+																<input type="hidden" name="product[variants][{{$var}}][image_id]" value="{{ $variant["image_id"] }}" >
+																<input type="hidden" name="product[images][{{$var+1}}][id]" value="{{ $variant["image_id"] }}" >
+																@endif
+																<td>{{$var+1}}</td>
+																<!-- <td style="width: 25px; text-align: center;"><input type="checkbox" class="checkthis" /></td> -->
+																<td style="width: 90px; text-align: center;">
+																	<img class="product-img" @if(array_key_exists($variant["image_id"],$images)) src="{{$images[$variant["image_id"]]}} " @else src="/images/no_image.png" height="45px" @endif alt="{{ $variant["title"] }}" style="max-width: 70px;" />
+																</td>
+																@if(!empty($variant["option1"]))
+																<td><input type="text" class="form-control" name="product[variants][{{$var}}][option1]" value="{{ $variant["option1"] }}"></td>
+																@endif
+																@if(!empty($variant["option2"]))
+																<td><input type="text" class="form-control" name="product[variants][{{$var}}][option2]" value="{{ $variant["option2"] }}"></td>
+																@endif
+																@if(!empty($variant["option3"]))
+																<td><input type="text" class="form-control" name="product[variants][{{$var}}][option3]" value="{{ $variant["option3"] }}"></td>
+																@endif
+																<td><input type="text" class="form-control" name="product[variants][{{$var}}][inventory_quantity]" value="{{ $variant["inventory_quantity"] }}"></td>
+																<td>
+																	<input type="text" name="product[variants][{{$var}}][price]" class="form-control" value="{{ $variant["price"] }}">
+																</td>
+																<td><input type="text" class="form-control" name="product[variants][{{$var}}][sku]" value="{{ $variant["sku"] }}"></td>
+																<td style="text-align: center;padding-right: 0px;"><a href="{{ route('variant.edit', ['product_id' => $product["id"], 'variant_id' => $variant["id"]]) }}"><i class="fa fa-edit"></i></a></td>
+																<!--<td><a data-toggle="modal" href="#deleteModal" data-product-id="{{$product["id"]}}" data-variant-id="{{$variant["id"]}}" class="grid-row-delete"><i class="fa fa-trash"></i></a></td>-->
+															</tr>
+														@endforeach
+													   </tbody>
+													</table>
                                             	</div>
                                             </div>
                                         </div>
@@ -131,7 +134,13 @@
                                                 </div>
                                                 <div class="col-content">
                                                     <label class="small-title" for="name">Tags</label>
-                                                    <select id="product_tags" name="product[tags][]" class="form-control" multiple="multiple"></select>
+                                                    <select id="product_tags" name="product[tags][]" class="form-control" multiple="multiple">
+														@if (!empty($product["tags"]))
+															@foreach(explode(',', $product["tags"]) as $tag) 
+																<option selected>{{$tag}}</option>
+															@endforeach
+														@endif
+													</select>
                                                 </div>
                                             </div>
                                         </div>
@@ -155,8 +164,8 @@
                                 </div>
 
                                 <div class="btn-actions">
-                                    <button class="btn btn-danger pull-left" onclick="window.history.back();">Cancel</button>
-                                    <button type="submit" class="btn btn-primary pull-right">Create</button>
+                                    <a class="btn btn-danger btn-remove-product pull-left" data-toggle="modal" href="#deleteModal" data-title="Delete" data-product-id="{{ $product["id"] }}"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete product</a>
+                                    <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
                                 </div>
                             {!! Form::close() !!}
                         </div>
@@ -168,39 +177,39 @@
     </div>
 </div>
 
-<script id="product-variant-template" type="text/template">
-    <h3>Modify the variants to be created:</h3>
-    <div class="table-wrapper">
-        <table class="table-responsive">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Variant</th>
-                <th>Price</th>
-                <th>SKU</th>
-                <th>Barcode</th>
-              </tr>
-            </thead>
-            <tbody id="tbody-variant-record"></tbody>
-        </table>
-    </div>
-</script>
-
-<script id="variant-record-template" type="text/template">
-    <tr>
-        <td>#</td>
-        <td><<title>></td>
-        <td><input type="text" class="form-control" name="price"></td>
-        <td><input type="text" class="form-control" name="sku"></td>
-        <td><input type="text" class="form-control" name="barcode"></td>
-    </tr>
-</script>
+<div class="modal modal-danger fade" tabindex="-1" id="deleteModal" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h2 class="modal-title">Delete product?</h2>
+            </div>
+            <div class="modal-body">
+                <p><i class="voyager-trash"></i> Deleted products cannot be recovered. Do you still want to continue?</p>  
+            </div>
+            <div class="modal-footer">
+                <form id="delete_form">
+                    <input type="button" class="btn btn-danger pull-right delete-confirm" value="Yes, Delete it!">
+                </form>
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal" style="margin-right: 10px;">Cancel</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
 
     {!! HTML::script('assets/js/select2.min.js') !!}
 
 <script>
     $(function() {
         CKEDITOR.replace( 'body_html' );
+
+        function stopRKey(evt) { 
+            var evt = (evt) ? evt : ((event) ? event : null); 
+            var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null); 
+            if ((evt.keyCode == 13) && (node.type=="text"))  {return false;} 
+        } 
+
+        document.onkeypress = stopRKey;
 
         var btn_remove_block = $("button[data-type=\"data-remove-variant\"]");
         var btn_add_block = $("#add-block-variant");
@@ -249,7 +258,6 @@
                 return;
             }
 
-
         });
 
         btn_remove_block.click(function(e) {
@@ -264,17 +272,41 @@
             return;
         });
 
-        //allow customer to purchase..
-        $("#variant-inventory_policy").click(function(){
-            if($(this).prop("checked") == true){
-                $("#product_variant_inventory_policy").val("continue");
-            }
-            else if($(this).prop("checked") == false){
-                $("#product_variant_inventory_policy").val("deny");
-            }
-        })
+        //remove
+        $(".btn-remove-product").click(function(e) {
 
-        //shipping
+            var product_id=$(this).attr("data-product-id");
+            $(".delete-confirm").click(function(e) {
+                $.ajax({
+                    url: "/product/destroy/" + product_id,
+                    type:"GET",
+                    dataType: 'json',
+                    data: { id : product_id },
+                    beforeSend: function (xhr) {
+                        var token = $('input[name="_token"]').val();
+                        if (token) {
+                            return xhr.setRequestHeader('X-CSRF-TOKEN', token);
+                        }
+                    },
+                    success: function(res) {
+                        if(res["status"] === "YES" ) {
+
+                            document.location.href="/";
+                            $('#deleteModal').modal('hide');
+                            toastr.success('Product was successfully deleted');
+                        }
+                    },
+                    error: function( data ) {
+                        if ( data["status"] === "NO" ) {
+                            toastr.error('Cannot delete the category');
+                            $('#deleteModal').modal('hide');
+                        }
+                    }
+                });
+            });
+        });
+		
+		//shipping
         $("#variant-requires_shipping").click(function(){
             if($(this).prop("checked") == true){
                 $("#product_variant_requires_shipping").val("true");
@@ -298,6 +330,45 @@
             }
         });
 
+        //remove
+        $(".grid-row-delete").click(function(e) {
+            var product_id=$(this).attr("data-product-id");
+            var variant_id=$(this).attr("data-variant-id");
+            $(".delete-confirm").click(function(e) {
+                $.ajax({
+                    url: "/product/" + product_id + "/variant/destroy/" + variant_id,
+                    type:"GET",
+                    dataType: 'json',
+                    data: { product_id : product_id , variant_id : variant_id},
+                    beforeSend: function (xhr) {
+                        var token = $('input[name="_token"]').val();
+                        if (token) {
+                            return xhr.setRequestHeader('X-CSRF-TOKEN', token);
+                        }
+                    },
+                    success: function(res) {
+
+                        console.log(res);
+
+
+                        // if(res["status"] === "YES" ) {
+
+                        //     var tr = $("#all-products").find("tr[data-id=" + product_id + "]");
+                        //     tr.remove();
+                        //     $('#deleteModal').modal('hide');
+                        //     toastr.success('Product was successfully deleted');
+                        // }
+                    },
+                    error: function( data ) {
+                        if ( data["status"] === "NO" ) {
+                            toastr.error('Cannot delete the category');
+                            $('#deleteModal').modal('hide');
+                        }
+                    }
+                });
+            });
+        });
+
         var pro_type = [
             {
                 id: "{{$product["product_type"]}}",
@@ -319,30 +390,6 @@
         //     });
         // }
 
-        var tags = [
-            {
-                id: 0,
-                text: 'enhancement'
-            },
-            {
-                id: 1,
-                text: 'bug'
-            },
-            {
-                id: 2,
-                text: 'duplicate'
-            },
-            {
-                id: 3,
-                text: 'invalid'
-            },
-            {
-                id: 4,
-                text: 'wontfix'
-            }
-        ];
-
-        
         $("#product_type").select2({
             data: pro_type,
             multiple: false,
@@ -356,7 +403,9 @@
         });
         
         $("#product_tags").select2({
-            tags:["red", "green", "blue"],
+            multiple: true,
+            tags: true,
+            tokenSeparators: [',', ' ']
         });
 
         $("#size").select2({

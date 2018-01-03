@@ -7,6 +7,7 @@ body {
     letter-spacing: initial!important;
     font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif!important;
     color: #212b35!important;
+    position: relative;
 }
 #products-index {
     margin-bottom: 50px;
@@ -205,8 +206,8 @@ section.content {
 }
 label.small-title{
     width: 100%;
-    font-size: 1,4rem; 
-    font-weight: 300; 
+    font-size: 1.4rem; 
+    font-weight: 400; 
     margin-bottom: 0.4rem;
     float: left;
 }
@@ -268,3 +269,83 @@ label.small-title small.notication{
 .select2-container--default .select2-search--inline .select2-search__field {
     width: 100%!important;
 }
+.form-control {
+    min-width: 80px;
+}
+p.product_type {
+	position: absolute;
+    top: 15px;
+    left: 135px;
+	font-size: 16px;
+	
+}
+p.product_count_variant {
+	position: absolute;
+    top: 35px;
+    left: 135px;
+	font-size: 14px;
+	color: #637381;
+	font-weight: 300;
+}
+p.product_list {
+	position: absolute;
+    bottom: 0px;
+    left: 135px;
+}
+p.product_list a{
+	font-size: 13px;
+	color: #007ace;
+	cursor: pointer;
+}
+ul.variants-list {
+	width: 100%;
+	float: left;
+	padding: 0px;
+}
+
+ul.variants-list li{
+    overflow: hidden;
+    white-space: nowrap; 
+	list-style: none;
+    border-top: 1px solid #ebeef0;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+	padding: 12px;
+}
+ul.variants-list li:hover, .active {
+	background-color: #999999;
+	color: #fff;
+	transition: all ease .3s;
+}
+ul.variants-list li:hover > img {
+	background-color: #fff;
+}
+ul.variants-list li img:hover, .active img {
+	background-color: #fff;
+}
+.loader {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background: url('/images/Preloader_11.gif') 50% 50% no-repeat #F9F9F9;
+    opacity: .8;
+}
+table#all-products tr td input{
+    border: 1px solid transparent;
+    background-color: transparent;
+    box-shadow: none;
+}
+table#all-products tr:hover td input{
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+}
+
+
+
+
+
+

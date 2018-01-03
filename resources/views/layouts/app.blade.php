@@ -20,7 +20,6 @@
 		{!! HTML::script('assets/ckeditor/ckeditor.js') !!}
 		{!! HTML::script('assets/js/bootstrap.min.js') !!}
 		{!! HTML::script('assets/js/select2.full.js') !!}
-		{!! HTML::script('assets/js/jquery.min.js') !!}
 		{!! HTML::script('assets/js/toastr.min.js') !!}
 		{!! HTML::script('//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js') !!}
         <!-- Google Fonts -->
@@ -28,6 +27,7 @@
 
     </head>
     <body>
+    	<div class="loader"></div>
         <div class="app-container">
             <div class="content-container">
                 <!-- Main Content -->
@@ -45,7 +45,11 @@
         $.ajaxSetup({
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
         });
-		
+
+        $(window).on('load', function(){
+        	$(".loader").fadeOut("slow");
+    	});
+
 		@if(Session::has('message'))
 			var type = "{{ Session::get('alert-type', 'info') }}";
 			switch(type){

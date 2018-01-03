@@ -42,7 +42,7 @@
                                                 </h3>
                                             </div>
                                             <div class="panel-body">
-                                                <input type="text" class="form-control" name="product[title]" placeholder="Short Sleeve T-Shirt" value="" required>
+                                                <input type="text" class="form-control" name="product[title]" placeholder="Short Sleeve T-Shirt">
                                             </div>
                                         </div>
 
@@ -84,7 +84,7 @@
                                                 </div>
                                                 <div class="col-content" id="check-inventory-policy" style="display: none;">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" id=variant-inventory_policy>Allow customers to purchase this product when it's out of stock</label>
+                                                        <label><input type="checkbox" id="variant-inventory_policy">Allow customers to purchase this product when it's out of stock</label>
                                                         <input type="hidden" name="product[variant][inventory_policy]" id="product_variant_inventory_policy" value="deny">
                                                     </div>
                                                 </div>
@@ -164,7 +164,6 @@
                                                         <input type="text" class="form-control" name="color" value="Color" >
                                                     </div>
                                                     <div class="col-md-8" style="padding-left: 0;">
-                                                        <!-- <input type="text" class="form-control" name="size_value" placeholder="Separate options with a comma" value="" > -->
                                                         <select id="color" name="colors[]" class="form-control" multiple></select>
                                                     </div>
                                                     <button type="button" data-type="data-remove-variant" class="btn btn-sm btn-danger pull-right"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
@@ -175,7 +174,6 @@
                                                         <input type="text" class="form-control" name="marterial" value="Material" >
                                                     </div>
                                                     <div class="col-md-8" style="padding-left: 0;">
-                                                        <!-- <input type="text" class="form-control" name="size_value" placeholder="Separate options with a comma" value="" > -->
                                                         <select id="material" name="materials[]" class="form-control" multiple></select>
                                                     </div>
                                                     <button type="button" data-type="data-remove-variant" class="btn btn-sm btn-danger pull-right"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
@@ -249,8 +247,8 @@
 	                                            </div>
                                                 <div class="col-content">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" value="">Charge taxes on this product</label>
-                                                        <input type="hidden" name="product[variant][taxable]" id="product_variant_taxable" value="true" data-bind="taxable">
+                                                        <label><input type="checkbox" id="product-variant_taxable">Charge taxes on this product</label>
+                                                        <input type="hidden" name="product[variant][taxable]" id="product_variant_taxable" value="true">
                                                     </div>
                                                 </div>
                                             </div>
@@ -272,8 +270,8 @@
                                 </div>
 
                                 <div class="btn-actions">
-                                    <button class="btn btn-danger pull-left" onclick="window.history.back();">Cancel</button>
-                                    <button type="submit" class="btn btn-primary pull-right">Create</button>
+                                    <button class="btn btn-danger pull-left" onclick="window.history.back();"><i class="fa fa-close"></i> Cancel</button>
+                                    <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-floppy-o" aria-hidden="true"></i> Create</button>
                                 </div>
                             {!! Form::close() !!}
                         </div>
@@ -399,6 +397,16 @@
             else if($(this).prop("checked") == false){
                 $("#product_variant_requires_shipping").val("false");
                 $(".shipping-content").hide();
+            }
+        })
+
+        //taxable
+        $("#product-variant_taxable").click(function(){
+            if($(this).prop("checked") == true){
+                $("#product_variant_taxable").val("true");
+            }
+            else if($(this).prop("checked") == false){
+                $("#product_variant_taxable").val("false");
             }
         })
 
